@@ -5,6 +5,9 @@ from tkinter.font import names
 MERM_WIDTH = 1
 MERM_SCALE = 3
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(SCRIPT_DIR)
+
 def updateSection (match):
     g1 = match.group(1)
     g2 = match.group(2)
@@ -104,6 +107,7 @@ def makeText (match):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    args = ["Планирование и бюджетирование деятельности организаций.md", "-s"]
     name = ""
     for a in args:
         if a[0] == "-":
@@ -129,6 +133,7 @@ if __name__ == "__main__":
     #     title = match.group(2)
 
     inp = updateGroup(inp, r"^(\t*)- (.*)", "itemize")
+    inp = updateGroup(inp, r"^(\t*)\* (.*)", "itemize")
     inp = updateGroup(inp, r"^(\t*)[0-9.]+\. (.*)", "enumerate")
     inp = updateGroup(inp, r"^(\t*)>(.*)", "mdquote", False)
 
@@ -148,9 +153,6 @@ if __name__ == "__main__":
 
     f = r"#(.*)"
     inp = re.sub(f, r"\#\1\\\\", inp) # Тэги или как их там
-
-    f = r"(\$\$?)([^$]*)(\$\$?)"
-    inp = re.sub(f, updateMath, inp, flags=re.MULTILINE) # Математика
 
     f = r"\[(.*)\]\((.*)\)"
     newF = r"\\href{\2}{\1}"
@@ -183,24 +185,51 @@ if __name__ == "__main__":
         out += box + r"\end{tabular}" + "\n"
     inp = out
 
-    match = False
-    out = ""
-    for line in inp.splitlines():
-        if line[:1] == "$$":
-            match = True
-            continue
-        elif not match and "*" in line:
-            check = re.sub(r"\*\*([^*]*)\*\*", r"\\textbf{\1}", line)
-            # check = re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check) # <-- Подключает курсив, но у меня он отображается некорректно + нужно продумать как его убрать внутри $ math $
-            out += check + "\n"
-        else:
-            out += line + "\n"
-            match = False
-    inp = out
-
     inp = re.sub(r"^(---)?(___)?$", r"\\medskip\n\\hrule\n\\medskip\n", inp, flags=re.MULTILINE)
     inp = inp.replace("->", "→")
     inp = inp.replace("<-", "←")
+
+    match = False
+    out = ""
+    for line in inp.splitlines():
+        if not match and "$$" in line:
+            match = True
+            out += line
+        elif "$$" in line:
+            match = False
+            out += line
+        elif not match:
+
+            # check = re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check) # <-- Подключает курсив, но у меня он отображается некорректно + нужно продумать как его убрать внутри $ math $
+
+            li = re.findall(r"(\$)?([^$]*)", line)
+            lis = []
+            for a in li:
+                for b in a:
+                    if b != "":
+                        lis.append(b)
+            lin = ""
+            m = False
+            for a in lis:
+                if not m and a == "$":
+                    m = True
+                    lin += "$"
+                elif a == "$":
+                    m = False
+                    lin += "$"
+                elif m:
+                    lin += a
+                else:
+                    check = re.sub(r"\*\*([^*]*)\*\*", r"\\textbf{\1}", a)
+                    check = check.replace("_", "\\_")
+                    lin += re.sub(r"\*([^*]*)\*", r"\textit{\1}", check)
+            out += lin + "\n"
+        else:
+            out += line + "\n"
+    inp = out
+
+    f = r"(\$\$?)([^$]*)(\$\$?)"
+    inp = re.sub(f, updateMath, inp, flags=re.MULTILINE) # Математика
 
     # inp = re.sub(r"```functionplot")
 
