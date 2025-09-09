@@ -1,0 +1,8 @@
+render*
+tmp*
+file.tex
+*.md
+.venv
+.idea
+*.pdf
+check.py

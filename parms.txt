@@ -1,0 +1,39 @@
+\documentclass{article}
+
+\usepackage{fontspec}            % Для выбора системных шрифтов
+
+\usepackage{polyglossia}         % Многоязычность
+\setmainlanguage{russian}
+\setotherlanguage{english}
+\usepackage{hyperref}
+
+\usepackage{amssymb}
+
+\setmainfont{Times New Roman}     % Любой шрифт, поддерживающий кириллицу
+\newfontfamily\cyrillicfont{Times New Roman}
+
+\usepackage{unicode-math}
+% \setmathfont{Latin Modern Math}
+\setmathfont{XITS Math}
+
+\usepackage{array}           % для центрирования и настройки колонок
+\usepackage{booktabs}        % для красивых линий (опционально)
+
+\usepackage{graphicx}
+
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+\newtcolorbox{mdquote}{
+  enhanced,
+  breakable,
+  colback=blue!5,    % фон
+  colframe=blue!80,  % рамка (будет линия слева)
+  left=6pt,          % отступ текста слева
+  right=0pt,         % отступ справа
+  boxrule=0pt,       % толщина рамки
+  borderline west={3pt}{0pt}{blue!40}, % цветная линия слева
+}
+\usepackage[a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+
+\usepackage{amsmath}
