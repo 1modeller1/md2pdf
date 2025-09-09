@@ -107,7 +107,6 @@ def makeText (match):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    args = ["Планирование и бюджетирование деятельности организаций.md", "-s"]
     name = ""
     for a in args:
         if a[0] == "-":
