@@ -20,3 +20,10 @@ $ sudo apt install nodejs npm
 $ npm install -g @mermaid-js/mermaid-cli
 ```
 
+Запуск приложения:
+```
+$ ./md2pdf.sh -s <FILE_NAME>.md
+```
+Опции:
+
+- "-s" для удаления всех промежуточных файлов 
