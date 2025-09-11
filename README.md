@@ -22,8 +22,26 @@ $ npm install -g @mermaid-js/mermaid-cli
 
 Запуск приложения:
 ```
-$ ./md2pdf.sh -s <FILE_NAME>.md
+$ ./md2pdf.sh -s <FileName>.md
 ```
 Опции:
 
-- "-s" для удаления всех промежуточных файлов 
+- "-s" для удаления всех промежуточных файлов
+
+---
+
+Для запуска скрипта из любой папки на компьютере командой `md2pdf <FileName>` добавьте следующую функцию в `.bashrc`:
+```bash
+md2pdf () {
+        loc=$PWD
+        cp "$1" <ProjectLocation>/Md2Pdf
+        cd <ProjectLocation>/Md2Pdf/
+        bash md2pdf.sh -s "$1"
+        mv "${1%.md}.pdf" "$loc"
+        rm "$1"
+        cd "$loc"
+}
+```
+
+P.S. \
+Если знаете более красивый способ реализовать запуск скрипта из любой папки - напишите.

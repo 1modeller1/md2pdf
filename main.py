@@ -119,8 +119,7 @@ if __name__ == "__main__":
     rem = True if args.count("-s") else False
     parms = open("parms.txt", "r")
 
-    inp = parms.read()
-    inp += "\n\n" + r"\begin{document}" + "\n"
+    inp = "\n\n" + r"\begin{document}" + "\n"
     inp += file.read()
 
     f = r"^(#)+ "
@@ -190,7 +189,15 @@ if __name__ == "__main__":
 
     match = False
     out = ""
+    isMdquote = False
     for line in inp.splitlines():
+        if r"\begin{mdquote}" == line: isMdquote = True
+        elif r"\end{mdquote}" == line: isMdquote = False
+
+        if r"\begin{itemize}" == line or r"\begin{enumerate}" == line:
+            if out[-3:] == (r"\\" + "\n"):
+                out = out[:-3]
+
         if not match and "$$" in line:
             match = True
             out += line
@@ -198,9 +205,6 @@ if __name__ == "__main__":
             match = False
             out += line
         elif not match:
-
-            # check = re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check) # <-- Подключает курсив, но у меня он отображается некорректно + нужно продумать как его убрать внутри $ math $
-
             li = re.findall(r"(\$)?([^$]*)", line)
             lis = []
             for a in li:
@@ -218,10 +222,13 @@ if __name__ == "__main__":
                     lin += "$"
                 elif m:
                     lin += a
-                else:
+                else:   # Функции вне любой математики
                     check = re.sub(r"\*\*([^*]*)\*\*", r"\\textbf{\1}", a)
                     check = check.replace("_", "\\_")
-                    lin += re.sub(r"\*([^*]*)\*", r"\textit{\1}", check)
+                    # check += re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check)               # Курсив (какая-то проблема со шрифтами)
+                    lin += check
+            if (lin[0] != "\\" or lin[:5] == r"\text") and not isMdquote:
+                lin += r" \\"
             out += lin + "\n"
         else:
             out += line + "\n"
@@ -232,7 +239,7 @@ if __name__ == "__main__":
 
     # inp = re.sub(r"```functionplot")
 
-    inp += "\\end{document}"
+    inp = parms.read() + inp + "\\end{document}"
     save = open("tmp.tex", "w")
     save.write(inp)
     save.close()
