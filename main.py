@@ -107,7 +107,6 @@ def makeText (match):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    # args = ["-s", "Ценообразование.md"]
     name = ""
     for a in args:
         if a[0] == "-":
@@ -230,7 +229,8 @@ if __name__ == "__main__":
                 else:   # Функции вне любой математики
                     check = re.sub(r"\*\*([^*]*)\*\*", r"\\textbf{\1}", a)
                     check = check.replace("_", "\\_")
-                    # check += re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check)               # Курсив (какая-то проблема со шрифтами)
+                    check = re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check)
+                    check = re.sub(r"==([^=]*)==", r"\\hl{\1}", check)
                     lin += check
             if (lin[0] != "\\" or lin[:5] == r"\text") and not isMdquote:
                 lin += r" \\"

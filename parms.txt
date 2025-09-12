@@ -9,8 +9,8 @@
 
 \usepackage{amssymb}
 
-\setmainfont{Times New Roman}     % Любой шрифт, поддерживающий кириллицу
-\newfontfamily\cyrillicfont{Times New Roman}
+\setmainfont{Liberation Serif}     % Любой шрифт, поддерживающий кириллицу
+\newfontfamily\cyrillicfont{Liberation Serif}
 
 \usepackage{unicode-math}
 % \setmathfont{Latin Modern Math}
@@ -23,6 +23,7 @@
 
 \usepackage[most]{tcolorbox}
 \usepackage{xcolor}
+\newcommand{\hl}[1]{\colorbox{yellow!50}{#1}}
 
 \newtcolorbox{mdquote}{
   enhanced,
