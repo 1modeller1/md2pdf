@@ -37,11 +37,11 @@ def updateGroup (inp, func, type, i=True) -> str:
         if len(m[0]) > level:
             document += "\\begin{"+type+"}\n"
             level += 1
-        document += "\\item "*i + m[1] + r"\\"*(not i) + "\n"
         if len(m[0]) < level:
-            if not i: document = document[:-3] = "\n"
+            if not i: document = document[:-3] + "\n"
             document += "\\end{"+type+"}\n"
             level -= 1
+        document += "\\item "*i + m[1] + r"\\"*(not i) + "\n"
     while level >= 0:
         if not i: document = document[:-3] + "\n"
         document += "\\end{"+type+"}\n"
@@ -107,6 +107,7 @@ def makeText (match):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    # args = ["-s", "Ценообразование.md"]
     name = ""
     for a in args:
         if a[0] == "-":
@@ -200,11 +201,15 @@ if __name__ == "__main__":
 
         if not match and "$$" in line:
             match = True
-            out += line
+            out += line + "\n"
+            if line.count("$$") % 2 == 0:
+                match = False
         elif "$$" in line:
             match = False
-            out += line
+            out += line + "\n"
         elif not match:
+            if line == "":
+                continue
             li = re.findall(r"(\$)?([^$]*)", line)
             lis = []
             for a in li:
