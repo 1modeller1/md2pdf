@@ -2,8 +2,10 @@ render*
 tmp*
 file.tex
 *.md
-!README.md
 .venv
 .idea
 *.pdf
 check.py
+
+!README.md
+!example*

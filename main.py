@@ -1,9 +1,12 @@
 import os, sys
 import re
-from tkinter.font import names
+import sympy as sp
+import matplotlib.pyplot as plt
+import numpy as np
 
 MERM_WIDTH = 1
 MERM_SCALE = 3
+PLOT_SCALE = 0.8
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(SCRIPT_DIR)
@@ -56,6 +59,55 @@ def updateMerm (match):
                r"\end{center}" + "\n")
     timer += 1
     return newMerm
+
+timerPlot = 0
+def getPlot (match):
+    global timerPlot, PLOT_SCALE
+    text = match.group(1)
+    title = (m := re.findall(r"title: (.*)", text)) and m[0] or None
+    xlabel = (m := re.findall(r"xLabel: (.*)", text)) and m[0] or None
+    ylabel = (m := re.findall(r"yLabel: (.*)", text)) and m[0] or None
+    bs = re.search(r"bounds: \[([^,]*),([^,]*),([^,]*),([^,]*)\]", text)
+    bounds = [float(bs.group(1)), float(bs.group(2)), float(bs.group(3)), float(bs.group(4))]
+    gd = (m := re.findall(r"grid: (.*)", text)) and m[0] or None
+    grid = False if gd == "false" or gd == None else True
+
+    eqs = (m := re.findall(r"=(.*)", text)) or None
+    if eqs == None: return ""
+
+    x = sp.Symbol("x")
+
+    for eq in eqs:
+        expr = sp.sympify(eq)
+        func = sp.lambdify(x, expr, "numpy")
+
+        t = np.arange(bounds[0], bounds[1] + 1, round((bounds[1] - bounds[0]) / 200, 2))
+        y = func(t)
+        plt.plot(t, y)
+
+    if grid:
+        plt.minorticks_on()
+        plt.grid(which="minor", color="#d0d0d0", linewidth=0.5)
+        plt.grid(color="#404040")
+
+    plt.xlim([bounds[0], bounds[1]])
+    plt.ylim([bounds[2], bounds[3]])
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif"
+    })
+
+    plt.savefig(f"tmpP{timerPlot}", dpi=160)
+
+    newPlot = (r"\begin{center}" + "\n"
+                                   r"\includegraphics[width=" + str(PLOT_SCALE) + r"\textwidth]{tmpP" + str(timerPlot) + ".png}\n"
+                 r"\end{center}" + "\n")
+    return newPlot
 
 def is_rus(ch: str) -> bool:
     return 'А' <= ch <= 'я' or ch in 'Ёё'
@@ -148,6 +200,9 @@ if __name__ == "__main__":
         print(os.system(f"export PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome && npx mmdc -i tmp.mmd -o tmp{t}.png --scale {MERM_SCALE}"))
         t += 1
     inp = re.sub(f, updateMerm, inp)
+
+    f = r"\`\`\` ?functionplot\n([^\`]*)\n\`\`\`"
+    inp = re.sub(f, getPlot, inp)
 
     f = r"#(.*)"
     inp = re.sub(f, r"\#\1\\\\", inp) # Тэги или как их там
