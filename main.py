@@ -68,7 +68,10 @@ def getPlot (match):
     xlabel = (m := re.findall(r"xLabel: (.*)", text)) and m[0] or None
     ylabel = (m := re.findall(r"yLabel: (.*)", text)) and m[0] or None
     bs = re.search(r"bounds: \[([^,]*),([^,]*),([^,]*),([^,]*)\]", text)
-    bounds = [float(bs.group(1)), float(bs.group(2)), float(bs.group(3)), float(bs.group(4))]
+    if bs != None:
+        bounds = [float(bs.group(1)), float(bs.group(2)), float(bs.group(3)), float(bs.group(4))]
+    else:
+        bounds = [-10,10,-10,10]
     gd = (m := re.findall(r"grid: (.*)", text)) and m[0] or None
     grid = False if gd == "false" or gd == None else True
 
