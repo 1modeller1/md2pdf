@@ -5,7 +5,7 @@ file.tex
 .venv
 .idea
 *.pdf
-check.py
+check*
 
 !README.md
 !example*

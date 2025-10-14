@@ -24,7 +24,7 @@ def updateList (match):
     return g2
 
 def updateGroup (inp, func, type, i=True) -> str:
-    document = ""
+    document = "\n"
     level = -1
     for line in inp.splitlines():
         m = re.findall(func, line)
@@ -227,23 +227,27 @@ if __name__ == "__main__":
                 n = line.count("|") - 1
                 box += r"\bigskip\\" + "\n" + r"\begin{tabular}{" + "|c"*n + "|}\n" + "\\hline"
                 doBox = True
+                first = True
             if "---" in line:
                 continue
-            box += line[1:-1].replace("|", " & ") + "\\\\\n" + "\\hline"
+            if first:
+                ins = re.sub(r"(?<=\|)(.*?)(?=\|)", r"\\textbf{\1}", line)
+                box += ins[1:-1].replace("|", " & ") + "\\\\\n" + "\\hline"
+                first = False
+            else:
+                box += line[1:-1].replace("|", " & ") + "\\\\\n" + "\\hline"
         elif doBox:
-            out += box + r"\end{tabular}" + "\n"
+            out += box + "\n" + r"\end{tabular} \\ \\" + "\n"
             box = ""
             doBox = False
             out += line + "\n"
         else:
             out += line + "\n"
     if doBox:
-        out += box + r"\end{tabular}" + "\n"
+        out += box + "\n" + r"\end{tabular} \\ \\" + "\n"
     inp = out
 
     inp = re.sub(r"^(---)?(___)?$", r"\\medskip\n\\hrule\n\\medskip\n", inp, flags=re.MULTILINE)
-    inp = inp.replace("->", "→")
-    inp = inp.replace("<-", "←")
 
     match = False
     out = ""
@@ -289,6 +293,12 @@ if __name__ == "__main__":
                     check = check.replace("_", "\\_")
                     check = re.sub(r"\*([^*]*)\*", r"\\textit{\1}", check)
                     check = re.sub(r"==([^=]*)==", r"\\hl{\1}", check)
+                    check = re.sub(r"\^", r"\^", check)
+                    check = re.sub(r"\%", r"\%", check)
+                    check = check.replace("-->", r"$\longrightarrow$")
+                    check = check.replace("->", r"$\rightarrow$")
+                    check = check.replace("<--", r"$\longleftarrow$")
+                    check = check.replace("<-", r"$\leftarrow$")
                     lin += check
             if (lin[0] != "\\" or lin[:5] == r"\text") and not isMdquote:
                 lin += r" \\"
