@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, shutil
 import re
 import sympy as sp
 import matplotlib.pyplot as plt
@@ -9,7 +9,6 @@ MERM_SCALE = 3
 PLOT_SCALE = 0.8
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(SCRIPT_DIR)
 
 def updateSection (match):
     g1 = match.group(1)
@@ -160,6 +159,17 @@ def makeText (match):
     else:
         return match.group(0)
 
+def findImage (match):
+    global MERM_WIDTH
+    imageName = match.group(1)
+    if os.path.exists(userPath+imageName):
+        text = "\n\\begin{figure}[H]\n\\centering\n"
+        text += r"\includegraphics[width="+str(MERM_WIDTH)+"\\textwidth]{"+userPath+imageName+"}\n"
+        text += "\\end{figure}"
+        return text
+    else:
+        return r"\hl{"+f"No image  {userPath+imageName}"+"}"
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     name = ""
@@ -170,9 +180,22 @@ if __name__ == "__main__":
         break
     if name == "":
         sys.exit("no file")
-    file = open(name, "r")
+
+    userPath = os.getcwd() + "/"
+    if os.path.exists(userPath+name):
+        location = userPath+name
+    elif os.path.exists(name):
+        location = name
+    else:
+        sys.exit("no file")
+
+    if not os.path.isdir("convert"):
+        os.mkdir("convert")
+    os.chdir("convert")
+
+    file = open(location, "r")
     rem = True if args.count("-s") else False
-    parms = open("parms.txt", "r")
+    parms = open(f"{SCRIPT_DIR}/parms.txt", "r")
 
     inp = "\n\n" + r"\begin{document}" + "\n"
     inp += file.read()
@@ -189,6 +212,8 @@ if __name__ == "__main__":
     inp = updateGroup(inp, r"^(\t*)\* (.*)", "itemize")
     inp = updateGroup(inp, r"^(\t*)[0-9.]+\. (.*)", "enumerate")
     inp = updateGroup(inp, r"^(\t*)>(.*)", "mdquote", False)
+
+    inp = re.sub(r"!\[{2}(.*)\]{2}", findImage, inp)
 
     f = r"\`\`\` ?merm(aid)?\n([^\`]*)\n\`\`\`"
     t = 0
@@ -317,10 +342,12 @@ if __name__ == "__main__":
     save.write(inp)
     save.close()
 
-    p = name.rfind(".")
-    name = '"' + name[:p] + '"'
-
-    os.system(f"xelatex -jobname={name} tmp.tex")
+    os.system(f"xelatex tmp.tex")
+    if "/" in name:
+        p = re.findall(r"\/([^.\/]+)\.", name)[0]
+    else:
+        p = re.findall(r"([^.]+)\.", name)[0]
+    p = userPath+p+".pdf"
+    shutil.copy("tmp.pdf", p)
     if rem:
-        os.system(f'rm tmp* {name}.log {name}.aux {name}.out')
-    # print(inp)
+        shutil.rmtree(f'{userPath}convert')
