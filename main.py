@@ -253,7 +253,7 @@ if __name__ == "__main__":
         if line[0] == "|" and line[-1] == "|":
             if doBox == False:
                 n = line.count("|") - 1
-                box += r"\bigskip\\" + "\n" + r"\begin{tabular}{" + "|c"*n + "|}\n" + "\\hline"
+                box += r"\bigskip" + "\n" + r"\begin{tabulary}{\textwidth}{" + "|L"*n + "|}\n" + "\\hline"
                 doBox = True
                 first = True
             if "---" in line:
@@ -265,14 +265,14 @@ if __name__ == "__main__":
             else:
                 box += line[1:-1].replace("|", " & ") + "\\\\\n" + "\\hline"
         elif doBox:
-            out += box + "\n" + r"\end{tabular} \\ \\" + "\n"
+            out += box + "\n" + r"\end{tabulary} \\ \\" + "\n"
             box = ""
             doBox = False
             out += line + "\n"
         else:
             out += line + "\n"
     if doBox:
-        out += box + "\n" + r"\end{tabular} \\ \\" + "\n"
+        out += box + "\n" + r"\end{tabulary} \\ \\" + "\n"
     inp = out
 
     inp = re.sub(r"^(---)?(___)?$", r"\\medskip\n\\hrule\n\\medskip\n", inp, flags=re.MULTILINE)

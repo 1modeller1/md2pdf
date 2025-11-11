@@ -42,8 +42,8 @@ $ ./md2pdf.sh -s <FileName>.md
 Для запуска скрипта из любой папки на компьютере командой `md2pdf <FileName>` добавьте следующую функцию в `.bashrc`:
 ```bash
 md2pdf () {
-        source .../Md2Pdf/.venv/bin/activate
-        python3 .../Md2Pdf/main.py -s "$1"
+        source .../md2pdf/.venv/bin/activate
+        python3 .../md2pdf/main.py "$1" "${@:2}"
         deactivate
 }
 ```
