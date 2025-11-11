@@ -13,8 +13,11 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 def updateSection (match):
     g1 = match.group(1)
     g2 = match.group(2)
-    rep = len(g1) % min_section
-    return "\\" + rep*"sub" + "section{" + g2 + "}"
+    rep = len(g1) - min_section
+    if rep <= 2:
+        return "\\" + rep*"sub" + "section{" + g2 + "}"
+    elif rep <= 4:
+        return "\\" + (rep-3) * "sub" + "paragraph{" + g2 + r"}"
 
 def updateList (match):
     g1 = match.group(1)
