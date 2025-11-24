@@ -238,7 +238,7 @@ if __name__ == "__main__":
     f = r"#(.*)"
     inp = re.sub(f, r"\#\1\\\\", inp) # Тэги или как их там
 
-    f = r"\[(.*)\]\((.*)\)"
+    f = r"\[([^\[]*)\]\(([^\(]*)\)"
     newF = r"\\href{\2}{\1}"
     inp = re.sub(f, newF, inp) # Ссылки
 
@@ -328,8 +328,8 @@ if __name__ == "__main__":
                     check = check.replace("<--", r"$\longleftarrow$")
                     check = check.replace("<-", r"$\leftarrow$")
                     lin += check
-            if (lin[0] != "\\" or lin[:5] == r"\text") and not isMdquote:
-                lin += r" \\"
+            if (lin[0] != "\\" or lin[:5] == r"\text" or lin[:5] == r"\href" or lin[:3] == r"\hl") and not isMdquote:
+                lin += "\n"        # Отступы между абзацами
             out += lin + "\n"
         else:
             out += line + "\n"

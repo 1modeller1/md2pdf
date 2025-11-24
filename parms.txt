@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 \usepackage{fontspec}            % Для выбора системных шрифтов
 
@@ -41,3 +41,6 @@
 \usepackage{amsmath}
 
 \usepackage{tabulary}
+
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{1em}
