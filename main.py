@@ -1,5 +1,5 @@
 import os, sys, shutil
-import re
+import regex as re
 import sympy as sp
 import matplotlib.pyplot as plt
 import numpy as np
@@ -238,9 +238,16 @@ if __name__ == "__main__":
     f = r"#(.*)"
     inp = re.sub(f, r"\#\1\\\\", inp) # Тэги или как их там
 
-    f = r"\[([^\[]*)\]\(([^\(]*)\)"
+    f = r"\[([^\[\]]+)\]\(((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*)\)"
     newF = r"\\href{\2}{\1}"
     inp = re.sub(f, newF, inp) # Ссылки
+
+    inp = inp.replace("<br><br>", r"\par\vspace{1em}")
+    inp = inp.replace("<br>", r"\par\vspace{0.5em}")
+
+    f = r"\%\%((?:(?!\%\%)[\s\S])*)\%\%"
+    newF = r"\\begin{comment}\n\1\n\\end{comment}"
+    inp = re.sub(f, newF, inp)
 
     # Таблицы
     out = ""
